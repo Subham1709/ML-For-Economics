@@ -121,8 +121,13 @@ def atm_straddle(day, r=0.065, target_days=30):
 def atm_series(files=None):
     """One row per day: the ATM straddle and its implied vol."""
     files = files or sorted(BHAV.glob("fo_*.csv.zip"))
-    rows = [atm_straddle(read_bhavcopy(f)) for f in files]
-    return pd.DataFrame([x for x in rows if x]).set_index("date")
+    rows, skipped = [], []
+    for f in files:
+        row = atm_straddle(read_bhavcopy(f))
+        (rows if row else skipped).append(row if row else Path(f).name)
+    if skipped:   # never drop days silently: say which files gave no straddle
+        print(f"skipped {len(skipped)} of {len(files)} files: {skipped[:10]}")
+    return pd.DataFrame(rows).set_index("date")
 
 
 if __name__ == "__main__":
