@@ -63,6 +63,8 @@ def read_bhavcopy(path):
     """Read either layout; return Nifty index options and futures only."""
     df = pd.read_csv(path)
     df.columns = df.columns.str.strip()
+    for c in df.columns[df.dtypes == object]:   # NSE pads some text fields
+        df[c] = df[c].str.strip()
     if "TckrSymb" in df.columns:                         # new UDiFF layout
         df = df.rename(columns=UDIFF_MAP)
         df["INSTRUMENT"] = df["INSTRUMENT"].map(UDIFF_TYPES)
