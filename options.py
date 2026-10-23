@@ -120,20 +120,53 @@ def atm_straddle(day, r=0.065, target_days=30):
             "call": c, "put": p, "straddle": c + p, "atm_iv": iv}
 
 
+ATM_CSV = Path(__file__).resolve().parent / "data" / "processed" / "atm_straddle.csv"
+
+
 def atm_series(files=None):
-    """One row per day: the ATM straddle and its implied vol."""
+    """One row per day: the ATM straddle and its implied vol.
+
+    A file that fails to parse is reported, not allowed to stop a
+    2,500-file run. Prints progress every 250 files.
+    """
     files = files or sorted(BHAV.glob("fo_*.csv.zip"))
-    rows, skipped = [], []
-    for f in files:
-        row = atm_straddle(read_bhavcopy(f))
+    rows, skipped, failed = [], [], []
+    for i, f in enumerate(files, 1):
+        try:
+            row = atm_straddle(read_bhavcopy(f))
+        except Exception as e:                       # noqa: BLE001
+            failed.append(f"{Path(f).name}: {type(e).__name__}: {e}")
+            continue
         (rows if row else skipped).append(row if row else Path(f).name)
+        if i % 250 == 0:
+            print(f"{i}/{len(files)} files read")
     if skipped:   # never drop days silently: say which files gave no straddle
-        print(f"skipped {len(skipped)} of {len(files)} files: {skipped[:10]}")
+        print(f"no straddle in {len(skipped)} of {len(files)} files: {skipped[:10]}")
+    if failed:
+        print(f"could not read {len(failed)} files:", *failed[:10], sep="\n  ")
     return pd.DataFrame(rows).set_index("date")
+
+
+def save_atm(path=ATM_CSV):
+    """Build the daily ATM table from all bhavcopy files and save it.
+
+    The result is small (one row per day), so it is committed to git;
+    the raw bhavcopy zips are not.
+    """
+    df = atm_series()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path)
+    print(f"saved {len(df)} days, {df.index.min().date()} to {df.index.max().date()}, to {path}")
+    print(df["atm_iv"].describe().round(3).to_string())
+    return df
+
+
+def load_atm(path=ATM_CSV):
+    return pd.read_csv(path, index_col="date", parse_dates=["date", "expiry"])
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 4 and sys.argv[1] == "download":
         download(sys.argv[2], sys.argv[3])
     else:
-        print(atm_series().tail())
+        save_atm()
