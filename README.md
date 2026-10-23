@@ -15,16 +15,20 @@ it sells volatility only when VIX sits well above the model's forecast.
 
 ![Nifty 50 realised volatility vs HAR forecast and India VIX](figures/rv_har_vix.png)
 
-Out-of-sample, Jan 2020 to Mar 2026 (n = 1,515):
+Out-of-sample, Dec 2009 to Sep 2026 (n = 4,103; HAR refitted daily on an expanding window):
 
-| Forecast | RMSE (vol pts) | QLIKE | Mean forecast | Mean realised |
-| --- | --- | --- | --- | --- |
-| HAR, Garman-Klass inputs | 8.61 | 0.369 | 16.6% | 15.2% |
-| HAR, close-to-close inputs | 8.68 | 0.376 | 16.0% | 15.2% |
-| India VIX | 8.54 | 0.349 | 17.3% | 15.2% |
+| Forecast | RMSE (vol pts) | QLIKE | MZ slope | Mean forecast | Mean realised |
+| --- | --- | --- | --- | --- | --- |
+| HAR, Garman-Klass inputs | 7.09 | 0.261 | 0.62 | 17.4% | 14.8% |
+| HAR, close-to-close inputs | 6.92 | 0.260 | 0.66 | 17.1% | 14.8% |
+| India VIX | 6.78 | 0.246 | 0.72 | 17.7% | 14.8% |
 
-VIX edges out HAR on both losses and runs about 2.2 vol points above realised volatility:
-the variance risk premium. Significance tests (Diebold-Mariano) come with the ML model.
+- India VIX beats HAR on both losses across 17 years, so the market's own forecast is the bar to clear.
+- VIX averages 2.9 vol points above the volatility that follows: the variance risk premium the straddle strategy tries to earn.
+- Garman-Klass range inputs do not improve HAR at a one-month horizon; close-to-close inputs do slightly better.
+- All Mincer-Zarnowitz slopes are below 1: every forecast overreacts to recent volatility.
+
+Significance tests (Diebold-Mariano) come with the ML model.
 
 ## Setup
 
@@ -47,7 +51,7 @@ Data downloads (need access to Yahoo Finance and nseindia.com):
 | --- | --- | --- |
 | A | `python -c "import data; data.download_yahoo()"` | Replaces the raw CSVs with full history (VIX back to 2008) |
 | B | `python options.py download 2016-01-01 2026-10-21` | Downloads daily F&O bhavcopy zips into `data/bhavcopy/` (about an hour) |
-| C | `python options.py` | Builds the daily ATM straddle and implied vol from those files |
+| C | `python options.py` | Builds the daily ATM straddle and implied vol; saves `data/processed/atm_straddle.csv` (about 15 min) |
 
 ## Files
 
@@ -62,17 +66,17 @@ Data downloads (need access to Yahoo Finance and nseindia.com):
 
 ## Data
 
-- Nifty 50 daily OHLC (Yahoo ^NSEI), 17 Sep 2007 to 13 Apr 2026, via the
-  GitHub mirror `kalilurrahman/NIFTY_50_STOCK_DATA`.
-- India VIX daily (Yahoo ^INDIAVIX), 2 Jan 2020 to 24 Aug 2026, via the
-  GitHub mirror `tanya459/india-vix-market-data-analysis`.
+- Nifty 50 daily OHLC (Yahoo ^NSEI), 17 Sep 2007 to 22 Oct 2026.
+- India VIX daily (Yahoo ^INDIAVIX), 3 Mar 2008 to 22 Oct 2026.
 - Spot checks against NSE closes: Nifty 4 Jun 2024 = 21,884.50; India VIX = 26.75.
-- NSE F&O bhavcopy (not committed; regenerate with step B).
+- NSE F&O bhavcopy, Jan 2016 to Oct 2026 (raw zips not committed; regenerate with step B).
+  The daily ATM table built from them is committed as `data/processed/atm_straddle.csv`.
 
 ## Status
 
 - [x] Week 1: data, features, HAR, first figure, tests
-- [ ] VIX back-fill to 2008; bhavcopy download and check on real files of both layouts
+- [x] VIX back-fill to 2008; bhavcopy download, checked on real files of both layouts
+- [ ] Build and commit the daily ATM implied vol table (step C)
 - [ ] Week 2: LightGBM, Diebold-Mariano test, ATM implied vol series
 - [ ] Week 3: straddle backtest on real prices, SEBI before/after test, write-up
 - [ ] Week 4: VaR and ES with Kupiec test, Streamlit page, talk
