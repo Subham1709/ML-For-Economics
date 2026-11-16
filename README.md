@@ -3,6 +3,8 @@
 Term paper for AIL 7310 (Machine Learning for Economics), IIT Jodhpur, by Subham Agrawal.
 Code is drafted with AI assistance, as the course requires; the author explains every part.
 
+The [daily SEBI F&O curbs pilot](sebi-fo-curbs-pilot/) contains the code, results and chart data for the presentation.
+
 ## Research questions
 
 1. Does LightGBM forecast Nifty 50's 21-day realised volatility better than the HAR-RV benchmark and India VIX?

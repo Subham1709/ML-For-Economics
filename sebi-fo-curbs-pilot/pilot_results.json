@@ -1,0 +1,94 @@
+{
+  "units": {
+    "volatility": "percent",
+    "gap": "percentage points",
+    "india_vix": "index points"
+  },
+  "inputs": {
+    "earliest_session": "2022-01-03",
+    "latest_session": "2025-12-31",
+    "regular_sessions": 984,
+    "ohlc_crosscheck_matching_dates": 249
+  },
+  "validation": {
+    "from": "2024-01-01",
+    "through": "2024-09-30",
+    "fit_n": 492,
+    "holdout_n": 184,
+    "rmse": {
+      "historical_mean": 0.4238346712391839,
+      "ols": 0.457958916607641,
+      "random_forest": 0.4467092650844795,
+      "gradient_boosting": 0.44120421444004293
+    },
+    "boosting_mean_observed_minus_forecast": 0.11527442424198787
+  },
+  "nifty_50": {
+    "from": "2024-11-21",
+    "through": "2025-01-31",
+    "fit_n": 676,
+    "n": 51,
+    "observed": 0.6635914499859872,
+    "gradient_boosting": {
+      "forecast": 0.5226296762920386,
+      "gap": 0.14096177369394858,
+      "conditional_95pct_interval": [
+        0.08542106905951857,
+        0.19650247832837858
+      ]
+    },
+    "historical_mean": {
+      "forecast": 0.6087060348995462,
+      "gap": 0.05488541508644105,
+      "conditional_95pct_interval": [
+        0.003656797256683185,
+        0.10611403291619892
+      ]
+    },
+    "ols": {
+      "forecast": 0.543354619069445,
+      "gap": 0.12023683091654216
+    },
+    "random_forest": {
+      "forecast": 0.5065079871362215,
+      "gap": 0.15708346284976574
+    },
+    "naive_before_after": {
+      "preceding_mean": 0.6577388807337963,
+      "gap": 0.005852569252190909
+    },
+    "boosting_2023_placebo": {
+      "n": 48,
+      "gap": 0.06543796792843973,
+      "conditional_95pct_interval": [
+        -0.027687507383896914,
+        0.15856344324077645
+      ]
+    },
+    "boosting_through_december_2025": {
+      "n": 275,
+      "gap": -0.012323736669876831,
+      "conditional_95pct_interval": [
+        -0.050544775571978146,
+        0.025897302232224473
+      ]
+    },
+    "boosting_fit_through_19_november": {
+      "gap": 0.13152217458347676
+    },
+    "high_low_range_sensitivity": {
+      "gap": 0.22945614616695964
+    }
+  },
+  "india_vix": {
+    "observed": 15.05377450980392,
+    "boosting_forecast": 13.416440308613314,
+    "gap": 1.6373342011906098,
+    "conditional_95pct_interval": [
+      0.5480466090854343,
+      2.7266217932957857
+    ],
+    "placebo_gap": 1.8712363763729716,
+    "through_december_2025_gap": -0.6743954097431374
+  }
+}
